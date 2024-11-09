@@ -11,7 +11,7 @@ const mattermostHeaders = {
 
 async function sendMessageToMattermost(
     message = "# 机器人已经掉线",
-    channelId = "7x3zotfak3r99nsco96m63bfrr"
+    channelId = process.env.MATTERMOST_CHANNEL_ID
 ) {
     if (!process.env.MATTERMOST_HOST || !process.env.MATTERMOST_API_KEY) {
         console.log(message);

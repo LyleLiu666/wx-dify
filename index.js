@@ -61,7 +61,7 @@ async function main() {
       const contactName = contact ? contact.name() : 'Unknown Contact';
       const roomName = room ? await room.topic() : null;
 
-      console.log(`来自: ${contactName}${roomName ? `, 群聊: ${roomName}` : ''} ---  ${message.talker()}`);
+      console.log(`来自: ${contactName}${roomName ? `, 群聊: ${roomName}` : ''} ---  ${message.talker().id}`);
 
       // 调用消息处理函数
       const response = await handleMessage({
