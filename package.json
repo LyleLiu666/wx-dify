@@ -1,0 +1,27 @@
+{
+  "name": "wechaty-demo",
+  "version": "1.0.0",
+  "engines": {
+    "node": "21.7.2"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "lyle",
+  "type": "module",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@koa/router": "^13.1.0",
+    "axios": "^1.x.x",
+    "dotenv": "^16.x.x",
+    "ioredis": "^5.4.1",
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "sqlite": "^4.2.1",
+    "sqlite3": "^5.1.7",
+    "wechaty": "^1.20.2"
+  }
+}
