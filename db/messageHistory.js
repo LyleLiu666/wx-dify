@@ -23,6 +23,7 @@ async function initDB() {
 }
 
 async function saveMessage(conversationId, sender, messageType, content) {
+    console.log('saveMessage', conversationId, sender, messageType, content);
     await db.run(
         'INSERT INTO messages (conversation_id, sender, message_type, content) VALUES (?, ?, ?, ?)',
         [conversationId, sender, messageType, content]
@@ -31,7 +32,7 @@ async function saveMessage(conversationId, sender, messageType, content) {
 
 async function getRecentContext(conversationId, limit = 10) {
     return await db.all(
-        'SELECT * FROM messages WHERE conversation_id = ? ORDER BY timestamp DESC LIMIT ?',
+        'SELECT * FROM messages WHERE conversation_id = ? ORDER BY timestamp asc LIMIT ?',
         [conversationId, limit]
     );
 }

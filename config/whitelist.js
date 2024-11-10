@@ -1,14 +1,25 @@
 import { whitelistDB } from '../db/whitelistDB.js';
+const ADMIN_IDS = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(',') : [];
+
 
 export const whitelist = {
+
+    async isAdmin(userId) {
+        return ADMIN_IDS.includes(userId);
+    },
+
     // 检查是否在白名单中
     // 示例:
     // const allowed = await whitelist.isAllowed('wxid_123', 'user'); // 检查用户
     // const allowed = await whitelist.isAllowed('12345@chatroom', 'room'); // 检查群组
     async isAllowed(id, type = 'user') {
+        if (await this.isAdmin(id)) {
+            return true;
+        }
+
         const enabled = await whitelistDB.isEnabled();
         if (!enabled) return true;
-        
+
         return await whitelistDB.isInWhitelist(id, type);
     },
 

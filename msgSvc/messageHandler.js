@@ -4,11 +4,32 @@ import { saveMessage, getRecentContext } from '../db/messageHistory.js';
 import { callDifyWorkflow, updateImage } from '../dify.js';
 import { whitelist } from '../config/whitelist.js';
 
-// 在文件顶部添加管理员配置
-const ADMIN_IDS = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(',') : [];
 
-function isAdmin(userId) {
-    return ADMIN_IDS.includes(userId);
+function getTypeName(typeId) {
+    switch (typeId) {
+        case PUPPET.types.Message.Text:
+            return 'text';
+        case PUPPET.types.Message.Image:
+            return 'image';
+        case PUPPET.types.Message.Audio:
+            return 'audio';
+        case PUPPET.types.Message.Video:
+            return 'video';
+        case PUPPET.types.Message.Contact:
+            return 'contact';
+        case PUPPET.types.Message.Emoticon:
+            return 'emoticon';
+        case PUPPET.types.Message.Location:
+            return 'location';
+        case PUPPET.types.Message.MiniProgram:
+            return 'miniprogram';
+        case PUPPET.types.Message.Url:
+            return 'url';
+        case PUPPET.types.Message.Attachment:
+            return 'attachment';
+        default:
+            return 'unknown';
+    }
 }
 
 async function handleMessage(message) {
@@ -17,36 +38,49 @@ async function handleMessage(message) {
         const room = message.message.room();
         const conversationId = room ? room.id : message.message.talker().id;
 
-        // 检查白名单 - 添加 await
+        // 处理admin管理命令
+        let text = message.message.text();
+        if (text && text.startsWith('/whitelist')) {
+            return await handleWhitelistCommand(message.message);
+        }
+
+        // 检查白名单  
         const isInWhitelist = await (room ?
             whitelist.isAllowed(room.id, 'room') :
             whitelist.isAllowed(message.message.talker().id));
 
+
+        //saveMessage去掉所有at的人名,以免类似邮箱的字符串也被替换
+        const mentionList = await message.message.mentionList()
+        for (let i of mentionList) {
+            text = text.replace(`@${i.name()}`, '')
+        }
         // 保存接收到的消息
         await saveMessage(
             conversationId,
-            message.message.talker().id,
-            message.message.type(),
-            message.message.text() || '[非文本消息]'
+            message.message.talker().name(),
+            getTypeName(message.message.type()),
+            text || ''
         );
 
-        // 处理白名单管理命令
-        const text = message.message.text();
-        if (text && text.startsWith('/whitelist')) {
-            return await handleWhitelistCommand(message.message);
-        }
+
+        const atOrPrivate = (room && await message.message.mentionSelf()) || (!room);
+
         // 如果不在白名单中，仅保存消息不处理
         if (!isInWhitelist) {
             console.log(`用户/群组 ${conversationId} 不在白名单中，跳过处理`);
-            return [{
-                type: 'text',
-                content: '转我主人66开始对话'
-            }];
+            if (atOrPrivate) {
+                return [{
+                    type: 'text',
+                    content: '转我主人66开始对话'
+                }];
+            }
         }
 
-        if (room && !await message.message.mentionSelf()) {
+        if (!atOrPrivate) {
             return null;
         }
+
         // 获取最近的上下文
         const context = await getRecentContext(conversationId);
 
@@ -79,7 +113,7 @@ async function handleMessage(message) {
         for (const reply of response) {
             await saveMessage(
                 conversationId,
-                'bot',
+                'npc(自己)',
                 reply.type,
                 reply.content
             );
@@ -97,14 +131,18 @@ async function handleMessage(message) {
 
 async function handleTextMessage(_message, context) {
     const message = _message.message;
-    const text = message.text();
+    let text = message.text();
     if (!text) {
         return [{
             type: 'text',
             content: '吃了撑，缓缓..'
         }];
     }
-
+    //去掉所有at的人名,以免类似邮箱的字符串也被替换
+    const mentionList = await message.mentionList()
+    for (let i of mentionList) {
+        text = text.replace(`@${i.name()}`, '')
+    }
     // 继续处理普通消息
     const input = {
         user_msg: text,
@@ -141,6 +179,11 @@ async function handleTextMessage(_message, context) {
                         console.error('Invalid image URL:', imgUrl);
                         continue;
                     }
+                    // import { FileBox }  from 'file-box'
+                    // const fileBox1 = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
+                    // const fileBox2 = FileBox.fromFile('/tmp/text.txt')
+                    // await contact.say(fileBox1)
+                    // await contact.say(fileBox2)
 
                     try {
                         // 如果已经是 base64 字符串，直接使用
@@ -174,7 +217,7 @@ async function handleTextMessage(_message, context) {
 
 async function handleWhitelistCommand(message) {
     // 检查是否是管理员
-    if (!isAdmin(message.talker().id)) {
+    if (!await whitelist.isAdmin(message.talker().id)) {
         return [{
             type: 'text',
             content: '您没有权限执行此操作'

@@ -8,8 +8,9 @@ export class MessageProcessor {
 
   async start() {
     setInterval(async () => {
+      console.log('检查消息队列状态');
       if (await this.messageQueue.isEmpty()) return;
-
+      console.log('消息队列非空，处理消息');
       const message = await this.messageQueue.dequeue();
       if (message) {
         await this.sendMessage(message);
