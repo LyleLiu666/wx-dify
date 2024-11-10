@@ -95,7 +95,7 @@ async function main() {
       const whitelist = enableWhitelist ? (room ? selfRoomAlias && selfRoomAlias.includes(whitelistKeywords) : contactAlias && contactAlias.includes(whitelistKeywords)) : true;
 
       const contactName = contact ? contact.name() : 'Unknown Contact';
-      console.log(1, selfRoomAlias, 2, contactAlias, 3, enableWhitelist, 4, whitelistKeywords,`${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
+      console.log(1, selfRoomAlias, 2, contactAlias, 3, message.type(),`${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
 
       // 调用消息处理函数
       const response = await handleMessage({

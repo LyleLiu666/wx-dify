@@ -9,9 +9,7 @@ export class MessageQueue {
 
   async enqueue(message) {
     try {
-      const result = await this.redis.rpush(this.queueKey, JSON.stringify(message));
-      const len = await this.redis.llen(this.queueKey);
-      console.log('消息入队列', result, len);
+      await this.redis.rpush(this.queueKey, JSON.stringify(message));
     } catch (error) {
       console.error('消息入队列失败:', error);
       throw error;
@@ -24,10 +22,10 @@ export class MessageQueue {
       if (!result) return null;
       const message = result[1];
       const parsedMessage = JSON.parse(message);
-      
+
       const messageId = parsedMessage.id || Date.now().toString();
       await this.redis.hset(this.processingKey, messageId, message);
-      
+
       return parsedMessage;
     } catch (error) {
       console.error('消息出队列失败:', error);

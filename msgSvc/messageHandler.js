@@ -132,6 +132,7 @@ async function handleTextMessage(_message, context) {
     for (let i of mentionList) {
         text = text.replace(`@${i.name()}`, '')
     }
+    console.log("start handleTextMessage", text);
     // 继续处理普通消息
     const input = {
         user_msg: text,
@@ -202,14 +203,14 @@ async function handleTextMessage(_message, context) {
 
         return responseList;
     }
-} 
+}
 
 // 其他处理函数也需要添加 context 参数
 async function handleImageMessage(_message, context) {
     const message = _message.message;
     const image = await message.toFileBox();
     const base64Data = await image.toBase64();
-
+    console.log("start handleImageMessage");
     // return [
     //     { 
     //         type: 'text', 
@@ -225,6 +226,7 @@ async function handleImageMessage(_message, context) {
 }
 
 async function handleAudioMessage(message, context) {
+    console.log("start handleImageMessage");
     // return [{ 
     //     type: 'text', 
     //     content: '收到语音消息'
@@ -233,6 +235,7 @@ async function handleAudioMessage(message, context) {
 }
 
 async function handleVideoMessage(message, context) {
+    console.log("start handleImageMessage");
     // return [{ 
     //     type: 'text', 
     //     content: '收到视频消息'
