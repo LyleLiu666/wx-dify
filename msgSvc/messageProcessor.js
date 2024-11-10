@@ -9,7 +9,6 @@ export class MessageProcessor {
   async start() {
     setInterval(async () => {
       if (await this.messageQueue.isEmpty()) return;
-
       const message = await this.messageQueue.dequeue();
       if (message) {
         await this.sendMessage(message);
