@@ -7,7 +7,9 @@ import { FileBox } from 'file-box';
 import { sendMessageToMattermost } from './mattermost.js';
 import { handleMessage } from './msgSvc/messageHandler.js';
 import { initDB } from './db/messageHistory.js';
+import { getRedisClient } from './config/redisConfig.js';
 
+const redisClient = getRedisClient();
 
 const bot = WechatyBuilder.build({
   name: process.env.WECHATY_NAME || 'wechat-bot',
@@ -67,12 +69,33 @@ async function main() {
       // 白名单
       const enableWhitelist = process.env.ENABLE_WHITELIST === 'true';
       const whitelistKeywords = process.env.WHITELIST_KEYWORDS;
-      const whitelist = enableWhitelist ? (room ? (await room.alias(selfContact)).includes(whitelistKeywords) : (await contact.alias()).includes(whitelistKeywords)) : true;
+
+      const roomName = room ? await room.topic() : null;
+      let selfRoomAlias, contactAlias;
+      if (room) {
+        const memberCount = (await room.memberAll()).length;
+        const selfRoomAliasCacheKey = `room_alias:${roomName + memberCount}:self`;
+        selfRoomAlias = room ? await redisClient.get(selfRoomAliasCacheKey).then(async cached => {
+          if (cached) return cached;
+          await selfContact.sync();
+          const alias = await room.alias(selfContact);
+          await redisClient.set(selfRoomAliasCacheKey, alias || '-', 'EX', 180); // 3分钟缓存
+          return alias;
+        }) : null;
+      } else {
+        const contactAliasCacheKey = `contact_alias:${contact.id}`;
+        contactAlias = await redisClient.get(contactAliasCacheKey).then(async cached => {
+          if (cached) return cached;
+          await contact.sync();
+          const alias = await contact.alias();
+          await redisClient.set(contactAliasCacheKey, alias || '-', 'EX', 180); // 3分钟缓存
+          return alias;
+        });
+      }
+      const whitelist = enableWhitelist ? (room ? selfRoomAlias && selfRoomAlias.includes(whitelistKeywords) : contactAlias && contactAlias.includes(whitelistKeywords)) : true;
 
       const contactName = contact ? contact.name() : 'Unknown Contact';
-      const roomName = room ? await room.topic() : null;
-
-      console.log(`${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
+      console.log(1, selfRoomAlias, 2, contactAlias, 3, enableWhitelist, 4, whitelistKeywords,`${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
 
       // 调用消息处理函数
       const response = await handleMessage({
