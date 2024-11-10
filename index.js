@@ -18,6 +18,10 @@ const bot = WechatyBuilder.build({
 
 const messageQueue = new MessageQueue();
 const messageProcessor = new MessageProcessor(bot, messageQueue);
+const whitelistKeywords = process.env.WHITELIST_KEYWORDS;
+const roomWhiteList = process.env.ROOM_LIST ? process.env.ROOM_LIST.split(',') : [];
+const vipRoomWhiteList = process.env.VIP_ROOM_LIST ? process.env.VIP_ROOM_LIST.split(',') : [];
+
 
 async function main() {
   await initDB();
@@ -68,13 +72,13 @@ async function main() {
       }
       // 白名单
       const enableWhitelist = process.env.ENABLE_WHITELIST === 'true';
-      const whitelistKeywords = process.env.WHITELIST_KEYWORDS;
+
 
       const roomName = room ? await room.topic() : null;
-      let roomInWhitelist, contactAlias;
+      let roomInWhitelist, contactAlias, isVip;
       if (room) {
-        const roomList = process.env.ROOM_LIST ? process.env.ROOM_LIST.split(',') : [];
-        roomInWhitelist = roomList.includes(roomName);
+        roomInWhitelist = roomWhiteList.includes(roomName);
+        isVip = vipRoomWhiteList ? vipRoomWhiteList.includes(roomName) : false;
       } else {
         const contactAliasCacheKey = `contact_alias:${contact.id}`;
         contactAlias = await redisClient.get(contactAliasCacheKey).then(async cached => {
@@ -88,14 +92,15 @@ async function main() {
       const whitelist = enableWhitelist ? (room ? roomInWhitelist : contactAlias && contactAlias.includes(whitelistKeywords)) : true;
 
       const contactName = contact ? contact.name() : 'Unknown Contact';
-      console.log(1, roomInWhitelist, 2, contactAlias, 3, message.type(),`${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
+      console.log(1, roomInWhitelist, 2, contactAlias, 3, message.type(), `${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
 
       // 调用消息处理函数
       const response = await handleMessage({
         message,
         contactName,
         roomName,
-        whitelist
+        whitelist,
+        isVip
       });
       if (!response) return;
       // 将消息和回复一起放入队列

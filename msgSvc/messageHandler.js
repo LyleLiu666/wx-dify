@@ -122,6 +122,7 @@ async function handleMessage(_message) {
 
 async function handleTextMessage(_message, context) {
     const message = _message.message;
+    const isVip = _message.isVip;
     let text = message.text();
     if (!text) {
         return [{
@@ -140,6 +141,7 @@ async function handleTextMessage(_message, context) {
     console.log("start handleTextMessage", text);
     // 继续处理普通消息
     const input = {
+        isVip: isVip ? 1 : 0,
         user_msg: text,
         fromType: _message.roomId ? 'chatroom' : 'friend',
         from_user_name: _message.contactName,
