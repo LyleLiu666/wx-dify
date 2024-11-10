@@ -30,10 +30,12 @@ async function saveMessage(conversationId, sender, messageType, content) {
 }
 
 async function getRecentContext(conversationId, limit = 10) {
-    return await db.all(
-        'SELECT * FROM messages WHERE conversation_id = ? ORDER BY timestamp asc LIMIT ?',
+    const messages = await db.all(
+        'SELECT * FROM messages WHERE conversation_id = ? ORDER BY id desc LIMIT ?',
         [conversationId, limit]
     );
+
+    return messages.reverse();
 }
 
 export {

@@ -35,7 +35,7 @@ async function callDifyChat(ask, userId, conversation_id, imageId) {
     }
 }
 
-async function updateImage(userId, imgBuffer, contentType) {
+async function uploadImage(userId, imgBuffer, contentType) {
     const blob = new Blob([imgBuffer], { type: contentType });
 
     const formData = new FormData();
@@ -58,8 +58,31 @@ async function updateImage(userId, imgBuffer, contentType) {
     return res.data.id
 }
 
+async function updateImageFromFile(userId, filePath) {
+    const formData = new FormData();
+    formData.append("user", userId);
+    formData.append('file', fs.createReadStream(filePath));
+
+    const res = await axios.post(`${process.env.DIFY_HOST}/v1/files/upload`, formData, {
+        maxContentLength: 100 * 1024 * 1024,// 设置为100MB
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${apiKey}`
+        }
+    })
+    if (res.status != 201 && res.status != 200) {
+        console.error(res.status)
+        console.error(res.statusText) 
+        console.error("updateImage error", res.data)
+        return ""
+    }
+    return res.data.id
+}
+
 async function callDifyWorkflow(userId, inputs = {}, files = null) {
-    // console.log("start callDifyWorkflow", userId, inputs.user_msg)
+    if (files) {
+        console.log("callDifyWorkflow with files", files)
+    }
     const apiUrl = `${process.env.DIFY_HOST}/v1/workflows/run`;
     
     const data = {
@@ -73,7 +96,10 @@ async function callDifyWorkflow(userId, inputs = {}, files = null) {
     }
 
     try {
-        const response = await axios.post(apiUrl, data, { headers });
+        const response = await axios.post(apiUrl, data, { 
+            headers,
+            timeout: 10 * 60 * 1000 // 10 minutes timeout
+        });
         if (response.status !== 200) {
             console.error("调用工作流出错", response.status, response.data);
             return {
@@ -99,6 +125,6 @@ async function callDifyWorkflow(userId, inputs = {}, files = null) {
 
 export {
     callDifyChat,
-    updateImage,
+    uploadImage as updateImage,
     callDifyWorkflow
 }; 

@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "npm config set maxsockets 2"
+    "preinstall": "npm config set maxsockets 2",
+    "test:db": "node test/testMessageHistory.js"
   },
   "author": "lyle",
   "type": "module",

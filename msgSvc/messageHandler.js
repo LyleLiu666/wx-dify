@@ -1,7 +1,7 @@
 import { FileBox } from 'file-box';
 import * as PUPPET from 'wechaty-puppet';
 import { saveMessage, getRecentContext } from '../db/messageHistory.js';
-import { callDifyWorkflow, updateImage } from '../dify.js';
+import { callDifyWorkflow, updateImage as uploadImage } from '../dify.js';
 
 
 
@@ -61,12 +61,26 @@ async function handleMessage(_message) {
             text = text.replace(mention, '')
         }
         // 保存接收到的消息
-        await saveMessage(
-            conversationId,
-            _message.message.talker().name(),
-            getTypeName(_message.message.type()),
-            text || ''
-        );
+        if (_message.message.type() === PUPPET.types.Message.Text && text) {
+            await saveMessage(
+                conversationId,
+                _message.message.talker().name(),
+                getTypeName(PUPPET.types.Message.Text),
+                text
+            );
+        } else if (_message.message.type() === PUPPET.types.Message.Image) {
+            const message = _message.message;
+            const imgFileBox = await message.toFileBox();
+            const imgBuffer = await imgFileBox.toBuffer()
+            
+            const userId = message.room() ? message.room().id + "-" + _message.contactName : message.talker().id;
+
+            const imgId = await uploadImage(userId, imgBuffer, imgFileBox.mediaType)
+            
+            await saveMessage(conversationId, _message.message.talker().name(),
+                getTypeName(PUPPET.types.Message.Image), imgId);
+        }
+
 
         if (!atOrPrivate) {
             return null;
@@ -135,27 +149,39 @@ async function handleTextMessage(_message, context) {
     for (let i of mentionList) {
         const alias = await i.alias();
         const mention = `@${i.name()}`
-        console.log(alias, "mention", mention)
         text = text.replace(mention, '')
     }
     console.log("start handleTextMessage", text);
     // 继续处理普通消息
     const input = {
-        isVip: isVip ? 1 : 0,
+        isVip: isVip ? 1 : -99,
         user_msg: text,
-        fromType: _message.roomId ? 'chatroom' : 'friend',
+        fromType: _message.message.room () ? 'chatroom' : 'friend',
         from_user_name: _message.contactName,
-        history_context: context.map(msg => `${msg.sender}: ${msg.content}`).toString().slice(-10240)
+        history_context: context.filter(msg => msg.message_type === 'text').map(msg => `${msg.sender}: ${msg.content}`).join('\n\n').slice(-8000)
     };
+
+    let files = [];
+    const imgs = context.filter(msg => msg.message_type === 'image');
+    
+    const lastImage = imgs.slice(-1)[0];
+    if (lastImage) {
+        const imageId = lastImage.content;
+        files.push({
+            transfer_method: 'local_file',
+            upload_file_id: imageId,
+            type: 'image'
+        });
+    }
 
     // 调用工作流
     const userId = message.room() ? message.room().id + "-" + _message.contactName : message.talker().id;
-    const result = await callDifyWorkflow(userId, input);
+    const result = await callDifyWorkflow(userId, input, files);
 
     if (!result.success) {
         return [{
             type: 'text',
-            content: result.error || '吃了撑，缓缓..'
+            content: '吃了撑，缓缓..'
         }];
     }
     const resData = result.data.data.outputs
