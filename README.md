@@ -26,7 +26,8 @@ input
   user_msg: "",
   fromType: "chatroom"/"friend",
   from_user_name: "",
-  history_context:"[]":
+  history_context:"[]",
+  isVip: -1/1
 }
 
 
@@ -40,9 +41,9 @@ output
 
 ## 白名单
 - ENABLE_WHITELIST=true/false，默认false，如果开启，则只有添加过白名单的用户才可以聊天
-- 管理员使用命令`/whitelist add talkerId user(或room)`添加
-- 使用命令`/whitelist list user`或`/whitelist list room`查看白名单
-- 管理员通过环境变量ADMIN_IDS配置，多个用`,`隔开
+- WHITELIST_KEYWORDS配置私聊白名单，把对方备注名中包含这些关键词的添加到白名单
+- ROOM_LIST群名称白名单，逗号隔开
+- VIP_ROOM_LIST群名称白名单，逗号隔开
 
 ## Mattermost
 - 这个配置是可选的，如果需要将消息同步到mattermost，则需要配置
