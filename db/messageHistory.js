@@ -23,7 +23,6 @@ async function initDB() {
 }
 
 async function saveMessage(conversationId, sender, messageType, content) {
-    console.log('saveMessage', conversationId, sender, messageType, content);
     await db.run(
         'INSERT INTO messages (conversation_id, sender, message_type, content) VALUES (?, ?, ?, ?)',
         [conversationId, sender, messageType, content]

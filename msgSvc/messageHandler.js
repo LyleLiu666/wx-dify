@@ -2,7 +2,7 @@ import { FileBox } from 'file-box';
 import * as PUPPET from 'wechaty-puppet';
 import { saveMessage, getRecentContext } from '../db/messageHistory.js';
 import { callDifyWorkflow, updateImage } from '../dify.js';
-import { whitelist } from '../config/whitelist.js';
+
 
 
 function getTypeName(typeId) {
@@ -32,50 +32,39 @@ function getTypeName(typeId) {
     }
 }
 
-async function handleMessage(message) {
+async function handleMessage(_message) {
     try {
         // 获取会话ID和发送者
-        const room = message.message.room();
-        const conversationId = room ? room.id : message.message.talker().id;
+        const room = _message.message.room();
+        const isInWhitelist = _message.whitelist;
+        const conversationId = room ? await room.topic() : _message.message.talker().name();
+        let text = _message.message.text();
 
-        // 处理admin管理命令
-        let text = message.message.text();
-        if (text && text.startsWith('/whitelist')) {
-            return await handleWhitelistCommand(message.message);
-        }
-
-        // 检查白名单  
-        const isInWhitelist = await (room ?
-            whitelist.isAllowed(room.id, 'room') :
-            whitelist.isAllowed(message.message.talker().id));
-
-
-        //saveMessage去掉所有at的人名,以免类似邮箱的字符串也被替换
-        const mentionList = await message.message.mentionList()
-        for (let i of mentionList) {
-            text = text.replace(`@${i.name()}`, '')
-        }
-        // 保存接收到的消息
-        await saveMessage(
-            conversationId,
-            message.message.talker().name(),
-            getTypeName(message.message.type()),
-            text || ''
-        );
-
-
-        const atOrPrivate = (room && await message.message.mentionSelf()) || (!room);
+        const atOrPrivate = (room && await _message.message.mentionSelf()) || (!room);
 
         // 如果不在白名单中，仅保存消息不处理
         if (!isInWhitelist) {
-            console.log(`用户/群组 ${conversationId} 不在白名单中，跳过处理`);
+            console.log(`用户/群组 ${conversationId} 不在白名单中`);
             if (atOrPrivate) {
                 return [{
                     type: 'text',
                     content: '转我主人66开始对话'
                 }];
             }
+            return null;
         }
+        //saveMessage去掉所有at的人名,避免类似邮箱的字符串也被替换
+        const mentionList = await _message.message.mentionList()
+        for (let i of mentionList) {
+            text = text.replace(`@${i.name()}`, '')
+        }
+        // 保存接收到的消息
+        await saveMessage(
+            conversationId,
+            _message.message.talker().name(),
+            getTypeName(_message.message.type()),
+            text || ''
+        );
 
         if (!atOrPrivate) {
             return null;
@@ -86,21 +75,21 @@ async function handleMessage(message) {
 
         // 根据消息类型处理
         let response;
-        switch (message.message.type()) {
+        switch (_message.message.type()) {
             case PUPPET.types.Message.Text:
-                response = await handleTextMessage(message, context);
+                response = await handleTextMessage(_message, context);
                 break;
 
             case PUPPET.types.Message.Image:
-                response = await handleImageMessage(message, context);
+                response = await handleImageMessage(_message, context);
                 break;
 
             case PUPPET.types.Message.Audio:
-                response = await handleAudioMessage(message, context);
+                response = await handleAudioMessage(_message, context);
                 break;
 
             case PUPPET.types.Message.Video:
-                response = await handleVideoMessage(message, context);
+                response = await handleVideoMessage(_message, context);
                 break;
 
             default:
@@ -213,91 +202,7 @@ async function handleTextMessage(_message, context) {
 
         return responseList;
     }
-}
-
-async function handleWhitelistCommand(message) {
-    // 检查是否是管理员
-    if (!await whitelist.isAdmin(message.talker().id)) {
-        return [{
-            type: 'text',
-            content: '您没有权限执行此操作'
-        }];
-    }
-
-    // 将连续空格替换为单个空格
-    const text = message.text().replace(/\s+/g, ' ');
-
-    let [cmd, action, id, type] = text.split(' ');
-    if (!action || !id) {
-        return [{
-            type: 'text',
-            content: '命令格式错误，请使用 /whitelist add <id> [type] 或 /whitelist remove <id> 或 /whitelist list [type]'
-        }];
-    } else if (action != 'list' && !type) {
-        return [{
-            type: 'text',
-            content: '命令格式错误，请使用 /whitelist add <id> [type] 或 /whitelist remove <id> 或 /whitelist list [type]'
-        }];
-    } else if (action == 'list' && !id) {
-        return [{
-            type: 'text',
-            content: '命令格式错误，请使用 /whitelist list [type]'
-        }];
-    }
-
-    try {
-        switch (action) {
-            case 'add':
-                await whitelist.add(id, type);
-                return [{
-                    type: 'text',
-                    content: `已将 ${id} 添加到${type === 'room' ? '群组' : '用户'}白名单`
-                }];
-
-            case 'remove':
-                await whitelist.remove(id);
-                return [{
-                    type: 'text',
-                    content: `已将 ${id} 从白名单移除`
-                }];
-
-            case 'list':
-                type = id;
-                const list = await whitelist.getList(type);
-                return [{
-                    type: 'text',
-                    content: `${type === 'room' ? '群组' : '用户'}白名单列表：\n${list.map(item => item.id).join('\n')}`
-                }];
-
-            case 'enable':
-                await whitelist.setEnabled(true);
-                return [{
-                    type: 'text',
-                    content: '已启用白名单'
-                }];
-
-            case 'disable':
-                await whitelist.setEnabled(false);
-                return [{
-                    type: 'text',
-                    content: '已禁用白名单'
-                }];
-
-            default:
-                return [{
-                    type: 'text',
-                    content: '支持的命令：\n/whitelist add <id> [type]\n/whitelist remove <id>\n/whitelist list [type]\n/whitelist enable\n/whitelist disable'
-                }];
-        }
-    } catch (error) {
-        console.error('白名单操作失败:', error);
-        return [{
-            type: 'text',
-            content: '操作失败：' + error.message
-        }];
-    }
-
-}
+} 
 
 // 其他处理函数也需要添加 context 参数
 async function handleImageMessage(_message, context) {

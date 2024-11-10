@@ -7,7 +7,7 @@ import { FileBox } from 'file-box';
 import { sendMessageToMattermost } from './mattermost.js';
 import { handleMessage } from './msgSvc/messageHandler.js';
 import { initDB } from './db/messageHistory.js';
-import { whitelistDB } from './db/whitelistDB.js';
+
 
 const bot = WechatyBuilder.build({
   name: process.env.WECHATY_NAME || 'wechat-bot',
@@ -19,7 +19,7 @@ const messageProcessor = new MessageProcessor(bot, messageQueue);
 
 async function main() {
   await initDB();
-  await whitelistDB.init();
+
   bot
     .on('scan', (qrcode, status) => {
       console.log(`扫描二维码登录: ${status}\nhttps://wechaty.js.org/qrcode/${encodeURIComponent(qrcode)}`);
@@ -46,8 +46,9 @@ async function main() {
     })
     .on('message', async message => {
       if (message.self()) return;
-      // await message.say("aaaa  shit!!");
-      // 基础消息信息
+      // 获取当前用户(机器人自己)的contact对象
+      const selfContact = bot.currentUser;
+
       const messageData = {
         type: 'single',
         messageId: message.id,
@@ -58,16 +59,27 @@ async function main() {
       // 获取联系人和群信息
       const contact = message.talker();
       const room = message.room();
+      if (!room && message.text() && message.text().includes("你仔细看看我是谁！")) {
+        // 同步备注
+        await contact.sync();
+        return;
+      }
+      // 白名单
+      const enableWhitelist = process.env.ENABLE_WHITELIST === 'true';
+      const whitelistKeywords = process.env.WHITELIST_KEYWORDS;
+      const whitelist = enableWhitelist ? (room ? (await room.alias(selfContact)).includes(whitelistKeywords) : (await contact.alias()).includes(whitelistKeywords)) : true;
+
       const contactName = contact ? contact.name() : 'Unknown Contact';
       const roomName = room ? await room.topic() : null;
 
-      console.log(`来自: ${contactName}${roomName ? `, 群聊: ${roomName}` : ''} ---  ${message.talker().id}`);
+      console.log(`${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
 
       // 调用消息处理函数
       const response = await handleMessage({
         message,
         contactName,
-        roomName
+        roomName,
+        whitelist
       });
       if (!response) return;
       // 将消息和回复一起放入队列
