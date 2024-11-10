@@ -71,17 +71,10 @@ async function main() {
       const whitelistKeywords = process.env.WHITELIST_KEYWORDS;
 
       const roomName = room ? await room.topic() : null;
-      let selfRoomAlias, contactAlias;
+      let roomInWhitelist, contactAlias;
       if (room) {
-        const memberCount = (await room.memberAll()).length;
-        const selfRoomAliasCacheKey = `room_alias:${roomName + memberCount}:self`;
-        selfRoomAlias = room ? await redisClient.get(selfRoomAliasCacheKey).then(async cached => {
-          if (cached) return cached;
-          await selfContact.sync();
-          const alias = await room.alias(selfContact);
-          await redisClient.set(selfRoomAliasCacheKey, alias || '-', 'EX', 180); // 3分钟缓存
-          return alias;
-        }) : null;
+        const roomList = process.env.ROOM_LIST ? process.env.ROOM_LIST.split(',') : [];
+        roomInWhitelist = roomList.includes(roomName);
       } else {
         const contactAliasCacheKey = `contact_alias:${contact.id}`;
         contactAlias = await redisClient.get(contactAliasCacheKey).then(async cached => {
@@ -92,10 +85,10 @@ async function main() {
           return alias;
         });
       }
-      const whitelist = enableWhitelist ? (room ? selfRoomAlias && selfRoomAlias.includes(whitelistKeywords) : contactAlias && contactAlias.includes(whitelistKeywords)) : true;
+      const whitelist = enableWhitelist ? (room ? roomInWhitelist : contactAlias && contactAlias.includes(whitelistKeywords)) : true;
 
       const contactName = contact ? contact.name() : 'Unknown Contact';
-      console.log(1, selfRoomAlias, 2, contactAlias, 3, message.type(),`${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
+      console.log(1, roomInWhitelist, 2, contactAlias, 3, message.type(),`${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
 
       // 调用消息处理函数
       const response = await handleMessage({

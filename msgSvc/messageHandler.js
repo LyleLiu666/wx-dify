@@ -40,12 +40,13 @@ async function handleMessage(_message) {
         const conversationId = room ? await room.topic() : _message.message.talker().name();
         let text = _message.message.text();
 
-        const atOrPrivate = (room && await _message.message.mentionSelf()) || (!room);
+        const at = room && await _message.message.mentionSelf()
+        const atOrPrivate = at || (!room);
 
         // 如果不在白名单中，仅保存消息不处理
         if (!isInWhitelist) {
             console.log(`用户/群组 ${conversationId} 不在白名单中`);
-            if (atOrPrivate) {
+            if (at) {
                 return [{
                     type: 'text',
                     content: '转我主人66开始对话'
@@ -56,7 +57,8 @@ async function handleMessage(_message) {
         //saveMessage去掉所有at的人名,避免类似邮箱的字符串也被替换
         const mentionList = await _message.message.mentionList()
         for (let i of mentionList) {
-            text = text.replace(`@${i.name()}`, '')
+            const mention = `@${i.name()}`
+            text = text.replace(mention, '')
         }
         // 保存接收到的消息
         await saveMessage(
@@ -130,7 +132,10 @@ async function handleTextMessage(_message, context) {
     //去掉所有at的人名,以免类似邮箱的字符串也被替换
     const mentionList = await message.mentionList()
     for (let i of mentionList) {
-        text = text.replace(`@${i.name()}`, '')
+        const alias = await i.alias();
+        const mention = `@${i.name()}`
+        console.log(alias, "mention", mention)
+        text = text.replace(mention, '')
     }
     console.log("start handleTextMessage", text);
     // 继续处理普通消息
