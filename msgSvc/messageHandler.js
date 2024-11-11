@@ -72,11 +72,11 @@ async function handleMessage(_message) {
             const message = _message.message;
             const imgFileBox = await message.toFileBox();
             const imgBuffer = await imgFileBox.toBuffer()
-            
+
             const userId = message.room() ? message.room().id + "-" + _message.contactName : message.talker().id;
 
             const imgId = await uploadImage(userId, imgBuffer, imgFileBox.mediaType)
-            
+
             await saveMessage(conversationId, _message.message.talker().name(),
                 getTypeName(PUPPET.types.Message.Image), imgId);
         }
@@ -116,12 +116,22 @@ async function handleMessage(_message) {
 
         // 保存回复的消息
         for (const reply of response) {
-            await saveMessage(
-                conversationId,
-                'npc(自己)',
-                reply.type,
-                reply.content
-            );
+            if (reply.type == 'image') {
+                // 如果是图片回复，需要先创建FileBox对象以便后续发送
+                const imgFileBox = FileBox.fromUrl(reply.imgUrl);
+                const imgBuffer = await imgFileBox.toBuffer()
+                const userId = room ? room.id + "-" + _message.contactName : _message.message.talker().id;
+                const imgId = await uploadImage(userId, imgBuffer, imgFileBox.mediaType)
+
+                await saveMessage(conversationId, 'npc(自己)', 'image', imgId);
+            } else if (reply.type == 'text') {
+                await saveMessage(
+                    conversationId,
+                    'npc(自己)',
+                    reply.type,
+                    reply.content
+                );
+            }
         }
 
         return response;
@@ -156,14 +166,14 @@ async function handleTextMessage(_message, context) {
     const input = {
         isVip: isVip ? 1 : -99,
         user_msg: text,
-        fromType: _message.message.room () ? 'chatroom' : 'friend',
+        fromType: _message.message.room() ? 'chatroom' : 'friend',
         from_user_name: _message.contactName,
         history_context: context.filter(msg => msg.message_type === 'text').map(msg => `${msg.sender}: ${msg.content}`).join('\n\n').slice(-8000)
     };
 
     let files = [];
     const imgs = context.filter(msg => msg.message_type === 'image');
-    
+
     const lastImage = imgs.slice(-1)[0];
     if (lastImage) {
         const imageId = lastImage.content;
@@ -219,7 +229,7 @@ async function handleTextMessage(_message, context) {
                         responseList.push({
                             type: 'image',
                             content: base64Data,
-                            filename: `image_${Date.now()}.png`
+                            imgUrl: imgUrl
                         });
                     } catch (e) {
                         console.error('Invalid base64 data:', e);
