@@ -73,9 +73,7 @@ async function handleMessage(_message) {
             const imgFileBox = await message.toFileBox();
             const imgBuffer = await imgFileBox.toBuffer()
 
-            const userId = message.room() ? message.room().id + "-" + _message.contactName : message.talker().id;
-
-            const imgId = await uploadImage(userId, imgBuffer, imgFileBox.mediaType)
+            const imgId = await uploadImage(conversationId, imgBuffer, imgFileBox.mediaType)
 
             await saveMessage(conversationId, _message.message.talker().name(),
                 getTypeName(PUPPET.types.Message.Image), imgId);
@@ -120,8 +118,8 @@ async function handleMessage(_message) {
                 // 如果是图片回复，需要先创建FileBox对象以便后续发送
                 const imgFileBox = FileBox.fromUrl(reply.imgUrl);
                 const imgBuffer = await imgFileBox.toBuffer()
-                const userId = room ? room.id + "-" + _message.contactName : _message.message.talker().id;
-                const imgId = await uploadImage(userId, imgBuffer, imgFileBox.mediaType)
+                
+                const imgId = await uploadImage(conversationId, imgBuffer, imgFileBox.mediaType)
 
                 await saveMessage(conversationId, 'npc(自己)', 'image', imgId);
             } else if (reply.type == 'text') {
@@ -162,11 +160,12 @@ async function handleTextMessage(_message, context) {
         text = text.replace(mention, '')
     }
     console.log("start handleTextMessage", text);
+    const room = _message.message.room();
     // 继续处理普通消息
     const input = {
         isVip: isVip ? 1 : -99,
         user_msg: text,
-        fromType: _message.message.room() ? 'chatroom' : 'friend',
+        fromType: room ? 'chatroom' : 'friend',
         from_user_name: _message.contactName,
         history_context: context.filter(msg => msg.message_type === 'text').map(msg => `${msg.sender}: ${msg.content}`).join('\n\n').slice(-8000)
     };
@@ -185,8 +184,8 @@ async function handleTextMessage(_message, context) {
     }
 
     // 调用工作流
-    const userId = message.room() ? message.room().id + "-" + _message.contactName : message.talker().id;
-    const result = await callDifyWorkflow(userId, input, files);
+    const conversationId = room ? await room.topic() : _message.message.talker().name();
+    const result = await callDifyWorkflow(conversationId, input, files);
 
     if (!result.success) {
         return [{
