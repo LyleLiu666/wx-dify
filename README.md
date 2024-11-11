@@ -59,3 +59,6 @@ output
 - [wechaty](https://github.com/wechaty/wechaty)
 
 - [Dify](https://github.com/langgenius/dify)
+
+## 加入交流群
+![](qrcode.jpg)
