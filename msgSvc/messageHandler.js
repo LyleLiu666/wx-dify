@@ -229,7 +229,8 @@ async function handleTextMessage(_message, context) {
                         responseList.push({
                             type: 'image',
                             content: base64Data,
-                            imgUrl: imgUrl
+                            imgUrl: imgUrl,
+                            filename: `reply_${Date.now()}.${imgUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)?.[1] || 'png'}`
                         });
                     } catch (e) {
                         console.error('Invalid base64 data:', e);
