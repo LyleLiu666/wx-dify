@@ -1,9 +1,10 @@
 # 使用说明
 ## 启动命令
 1. 安装依赖
+node版本 V21.x，可以参考package.json中配置
 ```
 # 在windows下可能会有问题，尽量使用linux或mac，如果出问题就是wechaty依赖问题，可以尝试安装puppeteer
-npm install
+npm install  # 相当于python中的 pip install -r xxxx
 ```
 2. 启动
 ```
