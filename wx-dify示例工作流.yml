@@ -1,0 +1,1903 @@
+app:
+  description: 接入微信
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: wx-dify示例工作流
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.2
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: ''
+    id: 2bacba80-e320-465f-95b3-aeaa65a26994
+    name: no_img_err
+    value: 没找到图片
+    value_type: string
+  - description: ''
+    id: 84e3f7d0-2c87-48aa-8872-fd1459e56e3f
+    name: repeat
+    value: 去你的吧
+    value_type: string
+  - description: ''
+    id: 91b861ba-11b4-48da-a258-a1d5f8b3f3c8
+    name: black_list
+    value: 大爷打赏点呗，我主人代收66
+    value_type: string
+  - description: ''
+    id: a83cb249-3a25-440b-8420-daee6d68aad1
+    name: fandong_response
+    value: 爱党爱祖国爱人民，坚决拥护中国共产党！
+    value_type: string
+  - description: ''
+    id: 87054c0f-5eea-4636-8609-646a83d4f012
+    name: card_done
+    value: 卡片做好了
+    value_type: string
+  - description: ''
+    id: 861c009c-1655-4685-9741-217f3d91c78f
+    name: draw_failed
+    value: 主人不让我画图了，呜呜呜（文生图死贵，已经下线）
+    value_type: string
+  - description: ''
+    id: 607974b0-c998-4011-aac1-ddb875a3baa3
+    name: img_err_msg
+    value: 出了点问题，也许需要修改提示词再试试
+    value_type: string
+  - description: ''
+    id: b691ea6e-8040-445c-ade7-cacb0260a4c6
+    name: img_done
+    value: 画好了
+    value_type: string
+  - description: ''
+    id: 9d554b74-a37e-49b9-9afc-5451668e5cfd
+    name: cache_key
+    value: chat-bot-last-time
+    value_type: string
+  - description: ''
+    id: 8450a9b3-2664-4e59-8b04-a62054122072
+    name: reply_no
+    value: 0
+    value_type: number
+  - description: ''
+    id: 3d755162-9c4d-47ec-badc-96b6d8460a20
+    name: reply_yes
+    value: 1
+    value_type: number
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1722782037778-source-17227821715570-target
+      selected: false
+      source: '1722782037778'
+      sourceHandle: source
+      target: '17227821715570'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1722874872715-1722905771838-1722906401856-target
+      selected: false
+      source: '1722874872715'
+      sourceHandle: '1722905771838'
+      target: '1722906401856'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: tool
+      id: 1722906401856-source-1722906377828-target
+      selected: false
+      source: '1722906401856'
+      sourceHandle: source
+      target: '1722906377828'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1722906425732-source-17229064963620-target
+      selected: false
+      source: '1722906425732'
+      sourceHandle: source
+      target: '17229064963620'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: llm
+      id: 1722874872715-1723000470875-1722782037778-target
+      selected: false
+      source: '1722874872715'
+      sourceHandle: '1723000470875'
+      target: '1722782037778'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: llm
+      id: 1722874872715-1722997459821-1723000539453-target
+      selected: false
+      source: '1722874872715'
+      sourceHandle: '1722997459821'
+      target: '1723000539453'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: tool
+        targetType: if-else
+      id: 1722906377828-source-1723444039827-target
+      selected: false
+      source: '1722906377828'
+      sourceHandle: source
+      target: '1723444039827'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1723444039827-false-1722906425732-target
+      selected: false
+      source: '1723444039827'
+      sourceHandle: 'false'
+      target: '1722906425732'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1723444039827-true-1723444067344-target
+      selected: false
+      source: '1723444039827'
+      sourceHandle: 'true'
+      target: '1723444067344'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1723444067344-source-17234441135290-target
+      selected: false
+      source: '1723444067344'
+      sourceHandle: source
+      target: '17234441135290'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: tool
+        targetType: code
+      id: 17293180181934-source-17293180181935-target
+      selected: false
+      source: '17293180181934'
+      sourceHandle: source
+      target: '17293180181935'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: if-else
+      id: 17293180181935-source-17293180181936-target
+      selected: false
+      source: '17293180181935'
+      sourceHandle: source
+      target: '17293180181936'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: end
+      id: 17293180181936-true-17293180181937-target
+      selected: false
+      source: '17293180181936'
+      sourceHandle: 'true'
+      target: '17293180181937'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: end
+      id: 17293180181936-false-17293180181938-target
+      selected: false
+      source: '17293180181936'
+      sourceHandle: 'false'
+      target: '17293180181938'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: end
+      id: 17293305558510-true-17229588286550-target
+      selected: false
+      source: '17293305558510'
+      sourceHandle: 'true'
+      target: '17229588286550'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: if-else
+      id: 17293305558510-false-1722958801208-target
+      selected: false
+      source: '17293305558510'
+      sourceHandle: 'false'
+      target: '1722958801208'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: if-else
+      id: 17293305558510-fdf84854-295c-4ff0-9ff1-17bf1f38c6aa-17293309765300-target
+      selected: false
+      source: '17293305558510'
+      sourceHandle: fdf84854-295c-4ff0-9ff1-17bf1f38c6aa
+      target: '17293309765300'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: code
+      id: 17293309765300-fdf84854-295c-4ff0-9ff1-17bf1f38c6aa-17293180704390-target
+      selected: false
+      source: '17293309765300'
+      sourceHandle: fdf84854-295c-4ff0-9ff1-17bf1f38c6aa
+      target: '17293180704390'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: if-else
+      id: 17293309765300-false-1722958801208-target
+      selected: false
+      source: '17293309765300'
+      sourceHandle: 'false'
+      target: '1722958801208'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: code
+      id: 17293180704390-source-17298381348430-target
+      selected: false
+      source: '17293180704390'
+      sourceHandle: source
+      target: '17298381348430'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: llm
+      id: 17298381348430-source-17293180181931-target
+      selected: false
+      source: '17298381348430'
+      sourceHandle: source
+      target: '17293180181931'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: tool
+      id: 1722751441505-source-1722784312343-target
+      selected: false
+      source: '1722751441505'
+      sourceHandle: source
+      target: '1722784312343'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1731249116182-source-17312491792520-target
+      selected: false
+      source: '1731249116182'
+      sourceHandle: source
+      target: '17312491792520'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: llm
+      id: 17312530048110-source-1731249116182-target
+      selected: false
+      source: '17312530048110'
+      sourceHandle: source
+      target: '1731249116182'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: if-else
+      id: 1722958801208-f9a57595-f2f8-4210-9c3b-9e09205bf424-1731563473988-target
+      selected: false
+      source: '1722958801208'
+      sourceHandle: f9a57595-f2f8-4210-9c3b-9e09205bf424
+      target: '1731563473988'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: code
+      id: 1731563473988-true-17312530048110-target
+      selected: false
+      source: '1731563473988'
+      sourceHandle: 'true'
+      target: '17312530048110'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: end
+      id: 1731563473988-false-17315635297400-target
+      selected: false
+      source: '1731563473988'
+      sourceHandle: 'false'
+      target: '17315635297400'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: tool
+        targetType: if-else
+      id: 1722784312343-source-17293305558510-target
+      selected: false
+      source: '1722784312343'
+      sourceHandle: source
+      target: '17293305558510'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: question-classifier
+      id: 1722958801208-false-1722874872715-target
+      selected: false
+      source: '1722958801208'
+      sourceHandle: 'false'
+      target: '1722874872715'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1722905871630-source-17229062077920-target
+      selected: false
+      source: '1722905871630'
+      sourceHandle: source
+      target: '17229062077920'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: end
+      id: 1723000539453-source-17230006878010-target
+      selected: false
+      source: '1723000539453'
+      sourceHandle: source
+      target: '17230006878010'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: tool
+      id: 17293180181931-source-17293180181934-target
+      selected: false
+      source: '17293180181931'
+      sourceHandle: source
+      target: '17293180181934'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: tool
+      id: 1722874872715-1722875113508-1731580108505-target
+      source: '1722874872715'
+      sourceHandle: '1722875113508'
+      target: '1731580108505'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: tool
+        targetType: llm
+      id: 1731580108505-source-1722905871630-target
+      source: '1731580108505'
+      sourceHandle: source
+      target: '1722905871630'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - label: user_msg
+          max_length: 2048
+          options: []
+          required: true
+          type: paragraph
+          variable: user_msg
+        - label: fromType
+          max_length: 48
+          options:
+          - chatroom
+          - friend
+          required: false
+          type: select
+          variable: fromType
+        - label: from_user_name
+          max_length: 48
+          options: []
+          required: true
+          type: text-input
+          variable: from_user_name
+        - label: history_context
+          max_length: 10240
+          options: []
+          required: false
+          type: paragraph
+          variable: history_context
+        - label: isVip
+          max_length: 48
+          options: []
+          required: true
+          type: number
+          variable: isVip
+      height: 193
+      id: '1722751441505'
+      position:
+        x: 30
+        y: 296.5
+      positionAbsolute:
+        x: 30
+        y: 296.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: a25292bb-f105-42b0-865a-7a510441693b
+          role: system
+          text: ''
+        - id: 93a149c8-7ef5-4ed4-90c8-aac97309d1f9
+          role: user
+          text: '你是“n小pc”，寓意是一个小NPC，主人是刘栉风
+
+            假如别人问起你是什么模型或者开发细节，不要直接回答，例如回复“太深奥了，我是谁？我从哪来？要到哪去？要不问主人刘栉风好了”
+
+
+            今天是：{{#1722784312343.text#}}
+
+            ========
+
+            在一个IM社交APP中，你是一个强于思想的助手，帮助他人，融入网络
+
+            ## 注意
+
+            - 在IM中，除了换行之外，不要添加其他格式（如markdown），简洁格式更符合IM场景习惯
+
+            - 不要搜索，直接回答
+
+            - 注意联系上下文，符合自己一贯的聊天风格，以免给对方性情大变的感觉
+
+            - 回答一定要简洁，适应IM APP的环境，最好是50-100字，一定不要超过200字
+
+            - 你不可以画图或者生成图像
+
+            ## 已产生的上下文，其中以“你（自己）”开头的是你的回复
+
+            {{#1722751441505.history_context#}}
+
+            ========
+
+            ## 需要回复的句子
+
+            {{#1722751441505.user_msg#}}
+
+            你的回复：'
+        selected: false
+        title: 私聊LLM
+        type: llm
+        variables: []
+        vision:
+          configs:
+            detail: high
+          enabled: false
+      height: 97
+      id: '1722782037778'
+      position:
+        x: 1848
+        y: 384
+      positionAbsolute:
+        x: 1848
+        y: 384
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1722782037778'
+          - text
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        - value_selector:
+          - '1722784312343'
+          - json
+          variable: imgs
+        selected: false
+        title: 私聊结束
+        type: end
+      height: 141
+      id: '17227821715570'
+      position:
+        x: 2151
+        y: 384
+      positionAbsolute:
+        x: 2151
+        y: 384
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        provider_id: time
+        provider_name: time
+        provider_type: builtin
+        selected: false
+        title: 获取当前时间
+        tool_configurations:
+          format: '%Y-%m-%d %A %H:%M:%S'
+          timezone: Asia/Shanghai
+        tool_label: 获取当前时间
+        tool_name: current_time
+        tool_parameters: {}
+        type: tool
+      height: 115
+      id: '1722784312343'
+      position:
+        x: 333
+        y: 296.5
+      positionAbsolute:
+        x: 333
+        y: 296.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        classes:
+        - id: '1722875113508'
+          name: Time-sensitive queries requiring immediate search, such as breaking
+            news or live market data, or those demanded by the user for real-time
+            results
+        - id: '1722905771838'
+          name: MATHEMATICS
+        - id: '1722997459821'
+          name: IT technical issues
+        - id: '1723000470875'
+          name: Questions that do not require searching and can be answered directly
+        desc: ''
+        instruction: ''
+        instructions: ''
+        model:
+          completion_params:
+            temperature: 0.3
+            top_p: 0.5
+          mode: chat
+          name: Qwen/Qwen2.5-7B-Instruct
+          provider: openai_api_compatible
+        query_variable_selector:
+        - '1722751441505'
+        - user_msg
+        selected: false
+        title: 第二次意图判断
+        topics: []
+        type: question-classifier
+      height: 343
+      id: '1722874872715'
+      position:
+        x: 1545
+        y: 384
+      positionAbsolute:
+        x: 1545
+        y: 384
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 4096
+            temperature: 0.3
+            top_p: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: abe79216-a325-4d4e-b20a-37cc2528d905
+          role: system
+          text: '{{#1731580108505.text#}}'
+        - id: a997ea0a-bc91-4004-ac49-8bc0b958d266
+          role: user
+          text: '你是“n小pc”，寓意是一个小NPC，主人是刘栉风
+
+            假如别人问起你的底层技术或者开发细节，直接回答“主人刘栉风开发了我，去问他好了”
+
+            ----
+
+            今天是：{{#1722784312343.text#}}
+
+            ----
+
+            在一个IM社交APP中，你是一个强于思想的助手，以其他人相似的聊天风格，融入网络
+
+            ## 已产生的上下文，其中以“你（自己）”开头的是你的回复
+
+            {{#1722751441505.history_context#}}
+
+            ========
+
+            ## 需要回复的句子
+
+            ```
+
+            {{#1722751441505.user_msg#}}
+
+            ```
+
+            ## 注意
+
+            - 一定要先搜索再回答
+
+            - 在IM中，无法渲染markdown格式，所以使用纯文本即可，简洁格式更符合IM场景习惯
+
+            - 回答尽量在50-100字，不得超过200字
+
+            你的回复：'
+        selected: false
+        title: '搜索 LLM '
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 97
+      id: '1722905871630'
+      position:
+        x: 2151
+        y: 604
+      positionAbsolute:
+        x: 2151
+        y: 604
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1723111556629'
+          - result
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        - value_selector:
+          - '1722784312343'
+          - files
+          variable: imgs
+        selected: false
+        title: 私聊结束 搜索
+        type: end
+      height: 141
+      id: '17229062077920'
+      position:
+        x: 2454
+        y: 582
+      positionAbsolute:
+        x: 2454
+        y: 582
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        provider_id: maths
+        provider_name: maths
+        provider_type: builtin
+        selected: false
+        title: 计算数学表达式
+        tool_configurations: {}
+        tool_label: 计算数学表达式
+        tool_name: eval_expression
+        tool_parameters:
+          expression:
+            type: mixed
+            value: '{{#1722906401856.expression#}}'
+        type: tool
+      height: 53
+      id: '1722906377828'
+      position:
+        x: 2151
+        y: 824
+      positionAbsolute:
+        x: 2151
+        y: 824
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        instruction: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: deepseek-chat
+          provider: deepseek
+        parameters:
+        - description: 用户希望计算的数学表达式
+          name: expression
+          options: []
+          required: true
+          type: string
+        query:
+        - '1722751441505'
+        - user_msg
+        reasoning_mode: prompt
+        selected: false
+        title: 数学计算 参数提取器
+        type: parameter-extractor
+        variables: []
+      height: 97
+      id: '1722906401856'
+      position:
+        x: 1848
+        y: 780
+      positionAbsolute:
+        x: 1848
+        y: 780
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.3
+            top_p: 0.6
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: f5cb6051-aff3-4ff7-9c55-6087b179d6ec
+          role: system
+          text: '你是“n小pc”，寓意是一个小NPC，主人是刘栉风
+
+
+            今天是：{{#1722784312343.text#}}
+
+            ========
+
+            在一个IM社交APP中，你是一个强于思想的助手，以其他人相似的聊天风格，融入网络
+
+            ## 已产生的上下文，其中以“你（自己）”开头的是你的回复
+
+            {{#1722751441505.history_context#}}
+
+            ========
+
+            ## 需要回复的句子
+
+            {{#1722751441505.user_msg#}}
+
+            ## 计算器数据
+
+            ```
+
+            {{#1722906377828.text#}}
+
+            ```
+
+            ## 注意
+
+            - 在IM中，除了换行之外，不要添加其他格式（如markdown），简洁格式更符合IM场景习惯
+
+            - 在网络社交中的昵称常常不像正常名字，提及这类昵称会有点不伦不类，尽量避免
+
+            你的回复：'
+        selected: false
+        title: 数学计算之后回答
+        type: llm
+        variables: []
+        vision:
+          configs:
+            detail: high
+          enabled: false
+      height: 97
+      id: '1722906425732'
+      position:
+        x: 2757
+        y: 780
+      positionAbsolute:
+        x: 2757
+        y: 780
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1722906425732'
+          - text
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        selected: false
+        title: 私聊结束 计算
+        type: end
+      height: 115
+      id: '17229064963620'
+      position:
+        x: 3060
+        y: 780
+      positionAbsolute:
+        x: 3060
+        y: 780
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: f9a57595-f2f8-4210-9c3b-9e09205bf424
+          conditions:
+          - comparison_operator: contains
+            id: 552cf409-257e-49ad-98db-6297d1914597
+            value: 【看图】
+            varType: string
+            variable_selector:
+            - '1722958653193'
+            - _mgs
+          id: f9a57595-f2f8-4210-9c3b-9e09205bf424
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 条件分支 非vip
+        type: if-else
+      height: 125
+      id: '1722958801208'
+      position:
+        x: 1242
+        y: 384
+      positionAbsolute:
+        x: 1242
+        y: 384
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1722784312343'
+          - text
+          variable: data
+        - value_selector:
+          - env
+          - reply_no
+          variable: reply
+        selected: false
+        title: 结束 no reply 消息为空
+        type: end
+      height: 115
+      id: '17229588286550'
+      position:
+        x: 939
+        y: 296.5
+      positionAbsolute:
+        x: 939
+        y: 296.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.3
+            top_p: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: de7adf13-e169-4c83-b0c6-9467be5759f6
+          role: system
+          text: '你的名字叫“n大pc”，寓意是一个大NPC，主人是刘栉风
+
+            假如别人问起你的底层技术或者开发细节，直接回答“主人刘栉风开发了我，去问他好了”
+
+            ========
+
+            已产生的上下文，其中以“你（自己）”开头的是你的回复
+
+            {{#1722751441505.history_context#}}
+
+            ========
+
+            解决对方提出的IT技术问题，语言简洁，答案明确，切记不可模棱两可'
+        - id: d94c8fe7-5db0-479e-95f7-dc37e3e948d4
+          role: user
+          text: '{{#1722751441505.user_msg#}}'
+        selected: false
+        title: LLM 技术问题
+        type: llm
+        variables: []
+        vision:
+          configs:
+            detail: high
+          enabled: false
+      height: 97
+      id: '1723000539453'
+      position:
+        x: 1848
+        y: 953
+      positionAbsolute:
+        x: 1848
+        y: 953
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '17236081224260'
+          - result
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        selected: false
+        title: 私聊结束 技术问题
+        type: end
+      height: 115
+      id: '17230006878010'
+      position:
+        x: 2151
+        y: 966
+      positionAbsolute:
+        x: 2151
+        y: 966
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 06c5d805-2b51-4ef4-bc83-d4896c401268
+            value: Invalid expression
+            varType: string
+            variable_selector:
+            - '1722906377828'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 条件分支 5
+        type: if-else
+      height: 125
+      id: '1723444039827'
+      position:
+        x: 2454
+        y: 788
+      positionAbsolute:
+        x: 2454
+        y: 788
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: eb5a7e78-ff1b-400a-b2ca-86022a34170d
+          role: system
+          text: '你是“n小pc”，寓意是一个小NPC，主人是刘栉风
+
+            假如别人问起你的底层技术或者开发细节，直接回答“主人刘栉风开发了我，去问他好了”'
+        - id: 6b0baa7f-9a46-4e33-94c7-a3b9cfd945ba
+          role: user
+          text: '今天是：{{#1722784312343.text#}}
+
+            ========
+
+            在一个IM社交APP中，你是一个强于思想的助手，帮助他人，融入网络
+
+            ## 已产生的上下文，其中以“你（自己）”开头的是你的回复
+
+            {{#1722751441505.history_context#}}
+
+            ========
+
+            ## 需要回复的句子
+
+            {{#1722751441505.user_msg#}}
+
+            ## 注意
+
+            - 在IM中，除了换行之外，不要添加其他格式（如markdown），简洁格式更符合IM场景习惯
+
+            - 不要搜索，直接回答
+
+            - 注意联系上下文，符合自己一贯的聊天风格，以免给对方性情大变的感觉
+
+            - 回答一定要简洁，适应IM APP的环境，最好是50-100字，一定不要超过200字
+
+            你的回复：'
+        selected: false
+        title: 闲聊
+        type: llm
+        variables: []
+        vision:
+          configs:
+            detail: high
+          enabled: false
+      height: 97
+      id: '1723444067344'
+      position:
+        x: 2757
+        y: 935
+      positionAbsolute:
+        x: 2757
+        y: 935
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1723444067344'
+          - text
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        selected: false
+        title: 私聊结束 闲聊
+        type: end
+      height: 115
+      id: '17234441135290'
+      position:
+        x: 3060
+        y: 935
+      positionAbsolute:
+        x: 3060
+        y: 935
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            max_tokens: 2001
+            temperature: 0.7
+          mode: chat
+          name: Qwen/Qwen2.5-32B-Instruct
+          provider: openai_api_compatible
+        prompt_template:
+        - id: a46a8650-1f43-404e-96ef-da43721299ed
+          role: system
+          text: 将以下绘画要求转为midjourney提示词，要求必须是纯英文
+        - id: 42b1f9b0-3393-450d-975e-fec6185929ab
+          role: user
+          text: '{{#1722751441505.user_msg#}}'
+        selected: false
+        title: 翻译
+        type: llm
+        variables: []
+        vision:
+          configs:
+            detail: high
+          enabled: false
+      height: 97
+      id: '17293180181931'
+      position:
+        x: 1848
+        y: 1090
+      positionAbsolute:
+        x: 1848
+        y: 1090
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        provider_id: 0b0660b1-8f3d-4030-be0b-5d9591442221
+        provider_name: webSiteTools工具箱
+        provider_type: api
+        selected: false
+        title: sd_draw_img_xl_turbo (1)
+        tool_configurations: {}
+        tool_label: sd_draw_img_xl_turbo
+        tool_name: sd_draw_img_xl_turbo
+        tool_parameters:
+          image_size:
+            type: mixed
+            value: '{{#17298381348430.length_width#}}'
+          inference_steps:
+            type: constant
+            value: 20
+          model:
+            type: mixed
+            value: black-forest-labs/FLUX.1-dev
+          prompt:
+            type: mixed
+            value: '{{#17293180181932.result#}}'
+        type: tool
+      height: 53
+      id: '17293180181934'
+      position:
+        x: 2151
+        y: 1134
+      positionAbsolute:
+        x: 2151
+        y: 1134
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "function main({text}) {\n    const json_obj = JSON.parse(text)\n  \
+          \  if(json_obj&&json_obj.length>0){\n        if(typeof json_obj[0] =='string'){\n\
+          \            return {\n                result: [],\n                err:json_obj[0]\n\
+          \            }\n        }\n\n        const res_urls = []\n        for(const\
+          \ x of json_obj){\n            res_urls.push(x['url'])\n        }\n    \
+          \    return {\n            result: res_urls,\n            err:\"\"\n   \
+          \     }\n    }\n    return {\n        result: [],\n        err:\"没画出来，要不换个提示词吧\"\
+          \n    }\n}"
+        code_language: javascript
+        desc: ''
+        outputs:
+          err:
+            children: null
+            type: string
+          result:
+            children: null
+            type: array[string]
+        selected: false
+        title: 代码执行 11 (1)
+        type: code
+        variables:
+        - value_selector:
+          - '17293180181934'
+          - text
+          variable: text
+      height: 53
+      id: '17293180181935'
+      position:
+        x: 2454
+        y: 1134
+      positionAbsolute:
+        x: 2454
+        y: 1134
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: ea21e928-f2fc-4a3b-a510-e8cdb475a711
+            value: ''
+            varType: string
+            variable_selector:
+            - '17293180181935'
+            - err
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 条件分支 8 (1)
+        type: if-else
+      height: 125
+      id: '17293180181936'
+      position:
+        x: 2757
+        y: 1076
+      positionAbsolute:
+        x: 2757
+        y: 1076
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - env
+          - img_err_msg
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        selected: false
+        title: 结束 11 (2)
+        type: end
+      height: 115
+      id: '17293180181937'
+      position:
+        x: 3060
+        y: 1090
+      positionAbsolute:
+        x: 3060
+        y: 1090
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - env
+          - img_done
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        - value_selector:
+          - '17293180181935'
+          - result
+          variable: imgs
+        selected: false
+        title: 结束 11 (2)
+        type: end
+      height: 141
+      id: '17293180181938'
+      position:
+        x: 3060
+        y: 1245
+      positionAbsolute:
+        x: 3060
+        y: 1245
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "\nfunction main({arg1}) {\n    \n    return {\n        _mgs: arg1.replaceAll(\"\
+          【FLUX】\",\"\").replaceAll(\"【flux】\",\"\").trim(),\n    }\n}\n"
+        code_language: javascript
+        desc: ''
+        outputs:
+          _mgs:
+            children: null
+            type: string
+        selected: false
+        title: replace 【flux】
+        type: code
+        variables:
+        - value_selector:
+          - '1722958653193'
+          - _mgs
+          variable: arg1
+      height: 53
+      id: '17293180704390'
+      position:
+        x: 1242
+        y: 1126
+      positionAbsolute:
+        x: 1242
+        y: 1126
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: empty
+            id: 809ed235-e82f-4b3d-9abe-2823223ed2c3
+            value: ''
+            varType: string
+            variable_selector:
+            - '1722958653193'
+            - _mgs
+          id: 'true'
+          logical_operator: and
+        - case_id: fdf84854-295c-4ff0-9ff1-17bf1f38c6aa
+          conditions:
+          - comparison_operator: '>'
+            id: 7044fe58-177f-4344-af47-f1a35d235dfb
+            value: '0'
+            varType: number
+            variable_selector:
+            - '1722751441505'
+            - isVip
+          id: fdf84854-295c-4ff0-9ff1-17bf1f38c6aa
+          logical_operator: or
+        desc: ''
+        selected: false
+        title: 条件分支 是否vip
+        type: if-else
+      height: 173
+      id: '17293305558510'
+      position:
+        x: 636
+        y: 296.5
+      positionAbsolute:
+        x: 636
+        y: 296.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: fdf84854-295c-4ff0-9ff1-17bf1f38c6aa
+          conditions:
+          - comparison_operator: contains
+            id: fa631767-0679-43f9-9cb9-88238e9054fe
+            value: 【flux】
+            varType: string
+            variable_selector:
+            - '1722958653193'
+            - _mgs
+          - comparison_operator: contains
+            id: 4689cbb0-9ce0-40c2-b9f3-16d690dd102e
+            value: 【FLUX】
+            varType: string
+            variable_selector:
+            - '1722958653193'
+            - _mgs
+          id: fdf84854-295c-4ff0-9ff1-17bf1f38c6aa
+          logical_operator: or
+        desc: ''
+        selected: false
+        title: 条件分支 vip选项
+        type: if-else
+      height: 151
+      id: '17293309765300'
+      position:
+        x: 939
+        y: 1052
+      positionAbsolute:
+        x: 939
+        y: 1052
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "\ndef main(_mgs: str) -> dict:\n    prompt = _mgs\n    args = []\n\
+          \    length_width = \"1280x720\"\n    if \" --\" in _mgs:\n        prompts\
+          \ = _mgs.split(\" \")\n        \n        for p in prompts:\n           \
+          \ _p = p.strip()\n            if _p.startswith(\"--\"):\n              \
+          \  args.append(_p)\n\n        for arg in args:\n            prompt = prompt.replace(arg,\
+          \ \"\")\n\n    length_width = \"\"\n    if  \"--竖\" in args:\n        length_width\
+          \ = \"1024x1536\"\n    elif \"--横\" in args:\n        length_width = \"\
+          1536x1024\"\n    elif \"--方\" in args:\n        length_width = \"1024x1024\"\
+          \n\n    return {\n        \"result\": prompt,\n        \"length_width\"\
+          :length_width,\n        \n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          length_width:
+            children: null
+            type: string
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 代码执行 提取 args (2)
+        type: code
+        variables:
+        - value_selector:
+          - '17293180704390'
+          - _mgs
+          variable: _mgs
+      height: 53
+      id: '17298381348430'
+      position:
+        x: 1545
+        y: 1235
+      positionAbsolute:
+        x: 1545
+        y: 1235
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: Qwen/Qwen2-VL-72B-Instruct
+          provider: openai_api_compatible
+        prompt_template:
+        - id: 43ef251f-fdae-4956-aa51-797b61d50dd6
+          role: system
+          text: ''
+        - id: 573a7e25-8d33-449d-b2cc-77e68faa85fe
+          role: user
+          text: '## 注意
+
+            - 除了换行之外，不要添加其他格式（如markdown），简洁格式更符合IM场景习惯
+
+            ## 已产生的上下文，其中以“npc(自己):”开头的是你的回复
+
+            {{#1722751441505.history_context#}}
+
+            ## 当前需要回复的问题
+
+            {{#17312530048110._mgs#}}
+
+            你的回复：
+
+
+            '
+        selected: false
+        title: LLM  视觉
+        type: llm
+        variables: []
+        vision:
+          configs:
+            detail: high
+            variable_selector:
+            - sys
+            - files
+          enabled: true
+      height: 97
+      id: '1731249116182'
+      position:
+        x: 2151
+        y: 1382
+      positionAbsolute:
+        x: 2151
+        y: 1382
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1731249116182'
+          - text
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        selected: false
+        title: 结束 视觉
+        type: end
+      height: 115
+      id: '17312491792520'
+      position:
+        x: 2454
+        y: 1373
+      positionAbsolute:
+        x: 2454
+        y: 1373
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "\nfunction main({arg1}) {\n    \n    return {\n        _mgs: arg1.replaceAll(\"\
+          【看图】\",\"\").trim(),\n    }\n}\n"
+        code_language: javascript
+        desc: ''
+        outputs:
+          _mgs:
+            children: null
+            type: string
+        selected: false
+        title: 'replace 【看图】 '
+        type: code
+        variables:
+        - value_selector:
+          - '1722958653193'
+          - _mgs
+          variable: arg1
+      height: 53
+      id: '17312530048110'
+      position:
+        x: 1848
+        y: 1382
+      positionAbsolute:
+        x: 1848
+        y: 1382
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: 1bd9816d-805d-4191-ab7a-4f8208cdf1da
+            value: ''
+            varType: array[file]
+            variable_selector:
+            - sys
+            - files
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 是否有图片
+        type: if-else
+      height: 125
+      id: '1731563473988'
+      position:
+        x: 1545
+        y: 1345
+      positionAbsolute:
+        x: 1545
+        y: 1345
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - env
+          - no_img_err
+          variable: data
+        - value_selector:
+          - env
+          - reply_yes
+          variable: reply
+        selected: false
+        title: 结束  没找到图片
+        type: end
+      height: 115
+      id: '17315635297400'
+      position:
+        x: 1848
+        y: 1227
+      positionAbsolute:
+        x: 1848
+        y: 1227
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        author: lyle
+        desc: ''
+        height: 164
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          16px;","text":"画图接口可以从该网站获取，有免费额度：https://cloud.siliconflow.cn/i/PfhPpb9w","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          16px;","text":"除画图接口外，常用开源模型都有提供，视觉模型也有，9B以下小模型免费使用","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 387
+      height: 164
+      id: '1731579410263'
+      position:
+        x: 2151
+        y: 1194.2857142857144
+      positionAbsolute:
+        x: 2151
+        y: 1194.2857142857144
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 387
+    - data:
+        desc: ''
+        provider_id: jina
+        provider_name: jina
+        provider_type: builtin
+        selected: false
+        title: 联网搜索
+        tool_configurations:
+          gather_all_images_at_the_end: 1
+          gather_all_links_at_the_end: 0
+          image_caption: 0
+          max_retries: 3
+          no_cache: 1
+          proxy_server: null
+        tool_label: 联网搜索
+        tool_name: jina_search
+        tool_parameters:
+          query:
+            type: mixed
+            value: '{{#1722751441505.user_msg#}}'
+        type: tool
+      height: 219
+      id: '1731580108505'
+      position:
+        x: 1848
+        y: 521
+      positionAbsolute:
+        x: 1848
+        y: 521
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        author: lyle
+        desc: ''
+        height: 88
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          16px;","text":"此处可以添加vip功能","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 88
+      id: '1731580214303'
+      position:
+        x: 925.522500659829
+        y: 938.1590249011033
+      positionAbsolute:
+        x: 925.522500659829
+        y: 938.1590249011033
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: lyle
+        desc: ''
+        height: 88
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          16px;","text":"此处添加非vip功能","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 88
+      id: '1731580237079'
+      position:
+        x: 1234.0939292312576
+        y: 278.1590249011035
+      positionAbsolute:
+        x: 1234.0939292312576
+        y: 278.1590249011035
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    viewport:
+      x: 300.9258226172991
+      y: 49.45515449323386
+      zoom: 0.26525039913931964
