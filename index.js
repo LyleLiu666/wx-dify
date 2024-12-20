@@ -91,7 +91,7 @@ async function main() {
       }
       const whitelist = enableWhitelist ? (room ? roomInWhitelist : contactAlias && contactAlias.includes(whitelistKeywords)) : true;
 
-      const contactName = contact ? contact.name() : 'Unknown Contact';
+      const contactName = contact ? contact.name() : 'Unknown Contact'; // todo  有很多获取不到username的场景
       console.log(1, roomInWhitelist, 2, contactAlias, 3, message.type(), `${roomName ? `群: ${roomName},` : ''}from: ${contactName}---  ${whitelist}`);
 
       // 调用消息处理函数
